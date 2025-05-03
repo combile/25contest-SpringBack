@@ -2,6 +2,7 @@ package com.example.newai.appuser.entity;
 
 import com.example.newai.appuser.vo.Level;
 import com.example.newai.comment.entity.Comment;
+import com.example.newai.login.RefreshToken;
 import com.example.newai.member.entity.Member;
 import com.example.newai.news.entity.News;
 import com.example.newai.quiz.repository.QuizRepository;
@@ -51,6 +52,8 @@ public class AppUser {
 
     @OneToOne(mappedBy = "appUser", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Member member;
+    @OneToOne(mappedBy = "appUser", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private RefreshToken refreshToken;
 
     @OneToMany(mappedBy = "appUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<News> bookmarks = new ArrayList<>();
@@ -62,4 +65,27 @@ public class AppUser {
     private List<Comment> comments = new ArrayList<>();
     @OneToMany(mappedBy = "appUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<QuizResult> quizResults = new ArrayList<>();
+
+    public void setMember(Member member) {
+        if (member == null) {
+            if (this.member != null) {
+                this.member.setAppUser(null);
+            }
+        } else {
+            member.setAppUser(this);
+        }
+        this.member = member;
+    }
+
+    public void setRefreshToken(RefreshToken refreshToken) {
+        if (refreshToken == null) {
+            if (this.refreshToken != null) {
+                this.refreshToken.setAppUser(null);
+            }
+        } else {
+            refreshToken.setAppUser(this);
+        }
+        this.refreshToken = refreshToken;
+    }
+
 }
