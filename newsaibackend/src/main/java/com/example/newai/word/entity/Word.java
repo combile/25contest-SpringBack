@@ -2,6 +2,7 @@ package com.example.newai.word.entity;
 
 import com.example.newai.appuser.entity.AppUser;
 import com.example.newai.appuser.vo.Level;
+import com.example.newai.news.entity.News;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -30,6 +31,10 @@ public class Word {
 
     @Enumerated(EnumType.STRING)
     private Level level;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "news_id")
+    private News news;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

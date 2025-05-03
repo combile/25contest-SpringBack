@@ -41,9 +41,11 @@ public class News {
     @CreationTimestamp
     private LocalDateTime createAt;
 
-    @OneToOne(mappedBy = "news", cascade = CascadeType.ALL, fetch = FetchType.EAGER) // 추후 OneToMany 할것인지 정하면 그때
-    private Summary summary;
-    @OneToOne(mappedBy = "news", cascade = CascadeType.ALL, fetch = FetchType.EAGER) // 추후 OneToMany 할것인지 정하면 그때
+    @OneToMany(mappedBy = "news", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Summary> summaries = new ArrayList<>();
+    @OneToMany(mappedBy = "news", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Word> words = new ArrayList<>();
+    @OneToOne(mappedBy = "news", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private PNEvaluation pnEvaluation;
     // wordDefinition 추가할지 말지 결정
 

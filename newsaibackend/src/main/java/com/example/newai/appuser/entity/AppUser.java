@@ -55,11 +55,11 @@ public class AppUser {
     @OneToMany(mappedBy = "appUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<News> bookmarks = new ArrayList<>();
     // 본 단어는 Word에서 뽑아오기
+    // 뉴스를 보게되면 해당 뉴스 안에 있는 단어를 seenWords에 모두 넣어줘야 함.
     @OneToMany(mappedBy = "appUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Word> seenWords = new ArrayList<>();
     @OneToMany(mappedBy = "appUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
     @OneToMany(mappedBy = "appUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<QuizResult> quizResults = new ArrayList<>();
-
 }

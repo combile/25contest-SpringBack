@@ -19,14 +19,13 @@ public class Summary {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long summaryId;
 
-    private String type;
     @Enumerated(EnumType.STRING)
     private Level level;
     @NotNull
     @NotBlank
     private String summaryContent;
 
-    @OneToOne(fetch = FetchType.LAZY) // 추후 Many 변경 가능
+    @ManyToOne(fetch = FetchType.LAZY) // 추후 Many 변경 가능
     @JoinColumn(name = "news_id")
     private News news;
 }
