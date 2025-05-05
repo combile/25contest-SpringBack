@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.validator.constraints.Range;
+import org.hibernate.validator.constraints.UniqueElements;
 
 @Entity
 @Getter
@@ -20,7 +21,7 @@ public class Member {
 
     @NotNull
     @NotBlank
-    @Range(min = 3, max = 15)
+    @Column(unique = true)
     private String loginId;
     @NotNull
     @NotBlank

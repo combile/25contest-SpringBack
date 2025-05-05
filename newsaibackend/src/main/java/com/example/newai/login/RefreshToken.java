@@ -21,7 +21,7 @@ public class RefreshToken {
     private AppUser appUser;
 
     @Column(nullable = false, unique = true)
-    private String token;
+    private String refreshToken;
 
     @Column(nullable = false)
     private Instant expiryDate;

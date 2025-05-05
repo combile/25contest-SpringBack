@@ -5,7 +5,6 @@ import com.example.newai.comment.entity.Comment;
 import com.example.newai.login.RefreshToken;
 import com.example.newai.member.entity.Member;
 import com.example.newai.news.entity.News;
-import com.example.newai.quiz.repository.QuizRepository;
 import com.example.newai.quizresult.entity.QuizResult;
 import com.example.newai.word.entity.Word;
 import jakarta.persistence.*;
@@ -17,7 +16,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.validator.constraints.Range;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,12 +34,13 @@ public class AppUser {
 
     @NotNull
     @NotBlank
-    @Max(value = 5)
     private String username;
     @NotNull
+    @Column(unique = true)
     private String phoneNumber;
     @NotNull
     @Email
+    @Column(unique = true)
     private String email;
 
     @NotNull
