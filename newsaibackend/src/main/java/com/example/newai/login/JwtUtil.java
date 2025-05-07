@@ -20,7 +20,7 @@ public class JwtUtil {
     private String ACCESS_SECRET_KEY;
     @Value("${jwt.refresh.secret.key}")
     private String REFRESH_SECRET_KEY;
-    private final Long ACCESS_EXP = Duration.ofMinutes(15).toMillis();
+    private final Long ACCESS_EXP = Duration.ofMinutes(1).toMillis();
     private final Long REFRESH_EXP = Duration.ofDays(7).toMillis();
 
     public String generateAccessToken(String loginId) {
@@ -84,6 +84,8 @@ public class JwtUtil {
                 .getSubject();
     }
 
+    // 리프레시 토큰은 항상 서버에서 관리하기 때문에 조작 위협은 적다. (서버가 해킹당하지 않는 이상)
+    // 따라서 굳이 유효성검사 함수를 빼기보단 기간 만료 되었는지 먼저 확인하자.
     public boolean isRefreshTokenExpired(String refreshToken) {
         Date exp = Jwts.parser()
                 .verifyWith(Keys.hmacShaKeyFor(REFRESH_SECRET_KEY.getBytes()))

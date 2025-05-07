@@ -36,12 +36,21 @@ public class RefreshTokenService {
         }
     }
 
-    public boolean validateRefreshToken(String refreshToken) {
+    public AppUser validateRefreshToken(String refreshToken) {
         RefreshToken checkRefreshToken = refreshTokenRepository.findByRefreshToken(refreshToken);
 
         if (checkRefreshToken == null)
-            return false;
+            return null;
 
-        return checkRefreshToken.getExpiryDate().isAfter(Instant.now());
+        if (checkRefreshToken.getExpiryDate().isAfter(Instant.now())) {
+            return refreshTokenRepository.findByRefreshToken(refreshToken).getAppUser();
+        }
+
+        return null;
+    }
+
+    public void deleteByRefreshToken(String refreshToken) {
+        RefreshToken targetRefreshToken = refreshTokenRepository.findByRefreshToken(refreshToken);
+        refreshTokenRepository.delete(targetRefreshToken);
     }
 }

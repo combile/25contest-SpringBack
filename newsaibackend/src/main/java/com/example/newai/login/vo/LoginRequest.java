@@ -1,4 +1,4 @@
-package com.example.newai.login;
+package com.example.newai.login.vo;
 
 import lombok.Data;
 
