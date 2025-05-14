@@ -47,6 +47,8 @@ public class AppUser {
     @Enumerated(EnumType.STRING)
     private Level vocabularyLevel;
 
+    private Integer views;
+
     @CreationTimestamp
     private LocalDateTime createAt;
 

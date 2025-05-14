@@ -36,7 +36,6 @@ public class News {
     private Integer views;
 
     private String thumbnailUrl;
-    private String topImageUrl;
 
     @CreationTimestamp
     private LocalDateTime createAt;

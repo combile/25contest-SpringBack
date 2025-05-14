@@ -24,15 +24,15 @@ public class SecurityConfig{
         http.cors(Customizer.withDefaults());
 
         http.authorizeHttpRequests(authorizeRequests ->
-                authorizeRequests.requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/app-user/test/creation").permitAll()
+                authorizeRequests.requestMatchers("/api/app-user/initial/**").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/v3/api-docs").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(PathRequest.toH2Console()).permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated()
 
         ).addFilter(new JwtAuthenticationFilter(authenticationManager, jwtUtil, refreshTokenService))
-                .addFilterAfter(new JwtAuthorizationFilter(jwtUtil, customUserDetailsService), JwtAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthorizationFilter(jwtUtil, customUserDetailsService), JwtAuthenticationFilter.class);
         http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
         return http.build();

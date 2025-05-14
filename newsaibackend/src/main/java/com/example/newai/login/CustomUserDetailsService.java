@@ -18,12 +18,17 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
-        try {
-            Member member = memberRepository.findByLoginId(loginId);
-            AppUser appUser = member.getAppUser();
-            return new CustomUserDetails(appUser);
-        } catch (UsernameNotFoundException e) {
-            throw new UsernameNotFoundException(e.getMessage());
+        Member member = memberRepository.findByLoginId(loginId);
+
+        if (member == null) {
+            throw new UsernameNotFoundException("회원을 찾을 수 없습니다: " + loginId);
         }
+
+        AppUser appUser = member.getAppUser();
+        if (appUser == null) {
+            throw new UsernameNotFoundException("AppUser 정보가 없습니다: " + loginId);
+        }
+
+        return new CustomUserDetails(appUser);
     }
 }
