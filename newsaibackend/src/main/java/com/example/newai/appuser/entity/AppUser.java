@@ -20,7 +20,9 @@ import org.hibernate.validator.constraints.UniqueElements;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -50,19 +52,27 @@ public class AppUser {
     private Integer views;
 
     @CreationTimestamp
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
 
     @OneToOne(mappedBy = "appUser", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Member member;
     @OneToOne(mappedBy = "appUser", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private RefreshToken refreshToken;
 
-    @OneToMany(mappedBy = "appUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<News> bookmarks = new ArrayList<>();
-    // 본 단어는 Word에서 뽑아오기
-    // 뉴스를 보게되면 해당 뉴스 안에 있는 단어를 seenWords에 모두 넣어줘야 함.
-    @OneToMany(mappedBy = "appUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Word> seenWords = new ArrayList<>();
+    @ManyToMany
+    @JoinTable(
+            name = "appuser_bookmarks",
+            joinColumns = @JoinColumn(name = "app_user_id"),
+            inverseJoinColumns = @JoinColumn(name = "news_id")
+    )
+    private Set<News> bookmarks = new HashSet<>();
+    @ManyToMany
+    @JoinTable(
+        name = "appuser_seen_words",
+        joinColumns = @JoinColumn(name = "app_user_id"),
+        inverseJoinColumns = @JoinColumn(name = "word_id")
+    )
+    private Set<Word> seenWords = new HashSet<>();
     @OneToMany(mappedBy = "appUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
     @OneToMany(mappedBy = "appUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

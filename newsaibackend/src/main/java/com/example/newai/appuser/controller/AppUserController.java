@@ -5,6 +5,8 @@ import com.example.newai.appuser.vo.AppUserDto;
 import com.example.newai.appuser.vo.AppUserRequest;
 
 import com.example.newai.appuser.vo.RedundancyCheckRequest;
+import com.example.newai.news.vo.NewsDto;
+import com.example.newai.news.vo.NewsRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -18,6 +20,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/app-user")
@@ -182,7 +187,7 @@ public class AppUserController {
                 required = true,
                 description = "Bearer 액세스 토큰. 형식: Bearer {accessToken}",
                 example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-            )
+            ),
         },
         responses = {
             @ApiResponse(
@@ -194,6 +199,90 @@ public class AppUserController {
     @DeleteMapping("/users")
     public ResponseEntity<?> deleteAppUser(Authentication authentication) {
         appUserService.deleteAppUser(authentication);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(
+        summary = "뉴스 북마크 추가",
+        description = "사용자가 뉴스 UUID를 이용해 북마크를 추가.",
+        parameters = {
+            @Parameter(
+                in = ParameterIn.HEADER,
+                name = HttpHeaders.AUTHORIZATION,
+                required = true,
+                description = "Bearer 액세스 토큰. 형식: Bearer {accessToken}",
+                example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            ),
+        },
+        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            required = true,
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = NewsRequest.class)
+            )
+        ),
+        responses = {
+            @ApiResponse(responseCode = "200", description = "북마크 성공",
+                content = @Content(schema = @Schema(implementation = NewsDto.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 뉴스",
+                content = @Content(schema = @Schema(type = "string", example = "존재하지 않는 뉴스입니다.")))
+        }
+    )
+    @PostMapping("/bookmark")
+    public ResponseEntity<?> bookmark(@RequestBody NewsRequest newsRequest, Authentication authentication) {
+        NewsDto newsDto = appUserService.newsBookmark(authentication, newsRequest.getUuid());
+
+        if (newsDto == null) {
+            return new ResponseEntity<>("존재하지 않는 뉴스입니다.", HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(newsDto, HttpStatus.OK);
+    }
+
+    @Operation(
+        summary = "북마크 목록 조회",
+        description = "현재 로그인한 사용자가 북마크한 뉴스 목록을 조회.<br>없는 사용자거나 북마크한 뉴스가 없다면 결과는 없음.",
+        parameters = {
+            @Parameter(
+                in = ParameterIn.HEADER,
+                name = HttpHeaders.AUTHORIZATION,
+                required = true,
+                description = "Bearer 액세스 토큰. 형식: Bearer {accessToken}",
+                example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            ),
+        },
+        responses = @ApiResponse(responseCode = "200", description = "북마크 뉴스 목록 반환",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = NewsDto.class)))
+    )
+    @GetMapping("/bookmark")
+    public ResponseEntity<?> getBookmark(Authentication authentication) {
+        List<NewsDto> newsDtoList = appUserService.readAllBookmark(authentication);
+
+        return new ResponseEntity<>(newsDtoList, HttpStatus.OK);
+    }
+
+    @Operation(
+        summary = "북마크 삭제",
+        description = "뉴스 UUID를 통해 북마크를 삭제합니다.<br>없는 사용자거나 없는 북마크 뉴스를 삭제해도 결과는 동일함.",
+        parameters = {
+            @Parameter(
+                in = ParameterIn.HEADER,
+                name = HttpHeaders.AUTHORIZATION,
+                required = true,
+                description = "Bearer 액세스 토큰. 형식: Bearer {accessToken}",
+                example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            ),
+        },
+        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            required = true,
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = NewsRequest.class))
+        ),
+        responses = @ApiResponse(responseCode = "200", description = "북마크 삭제 성공")
+    )
+    @DeleteMapping("/bookmark")
+    public ResponseEntity<?> deleteBookmark(@RequestBody NewsRequest newsRequest, Authentication authentication) {
+        appUserService.deleteNewsBookmark(authentication, newsRequest.getUuid());
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

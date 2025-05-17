@@ -10,6 +10,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 @Entity
 @Getter
 @Setter
@@ -17,7 +22,7 @@ import lombok.ToString;
 public class Word {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long wordDefinitionId;
+    private Long wordId;
 
     @NotNull
     @NotBlank
@@ -36,7 +41,6 @@ public class Word {
     @JoinColumn(name = "news_id")
     private News news;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private AppUser appUser;
+    @ManyToMany(mappedBy = "seenWords", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},  fetch = FetchType.LAZY)
+    private Set<AppUser> appUsers = new HashSet<>();
 }

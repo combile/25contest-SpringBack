@@ -10,6 +10,13 @@ import com.example.newai.login.CustomUserDetails;
 import com.example.newai.member.entity.Member;
 import com.example.newai.member.repository.MemberRepository;
 import com.example.newai.member.vo.MemberDto;
+import com.example.newai.news.entity.News;
+import com.example.newai.news.repository.NewsRepository;
+import com.example.newai.news.service.NewsService;
+import com.example.newai.news.service.NewsServiceJpaImpl;
+import com.example.newai.news.vo.NewsDto;
+import com.example.newai.word.entity.Word;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -18,8 +25,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,8 +36,9 @@ public class AppUserServiceJpaImpl implements AppUserService {
     private final PasswordEncoder passwordEncoder;
     private final AppUserRepository appUserRepository;
     private final MemberRepository memberRepository;
-    private final ModelMapper modelMapper;
+    private final NewsRepository newsRepository;
 
+    @Transactional
     @Override
     public AppUserDto createAppUser(AppUserRequest appUserRequest) {
         AppUser appUser = new AppUser();
@@ -48,15 +58,7 @@ public class AppUserServiceJpaImpl implements AppUserService {
         appUserRepository.save(appUser);
         memberRepository.save(member);
 
-        AppUserDto appUserDto = new AppUserDto(
-                appUser.getAppUserId(),
-                appUser.getUsername(),
-                appUser.getPhoneNumber(),
-                appUser.getEmail(),
-                appUser.getVocabularyLevel(),
-                0,
-                new MemberDto(member.getMemberId(), member.getLoginId(), member.getPassword(), null)
-        );
+        AppUserDto appUserDto = appUserToAppUserDto(appUser);
 
         return appUserDto;
     }
@@ -74,6 +76,7 @@ public class AppUserServiceJpaImpl implements AppUserService {
     }
 
     @Override
+    @Transactional
     public AppUserDto updateAppUser(Authentication authentication, AppUserRequest appUserRequest) {
         Optional<AppUser> authAppUser = authenticationToAppUser(authentication);
 
@@ -103,10 +106,115 @@ public class AppUserServiceJpaImpl implements AppUserService {
     }
 
     @Override
+    @Transactional
     public void deleteAppUser(Authentication authentication) {
         Optional<AppUser> appUser = authenticationToAppUser(authentication);
         appUser.ifPresent(appUserRepository::delete);
     }
+
+    // Field Method
+    @Override
+    @Transactional
+    public void updateAppUserViews(Authentication authentication) {
+        Optional<AppUser> authAppUser = authenticationToAppUser(authentication);
+
+        if (authAppUser.isEmpty())
+            return;
+
+        AppUser appUser = authAppUser.get();
+        appUser.setViews(appUser.getViews() + 1);
+
+        appUserRepository.save(appUser);
+    }
+
+    @Override
+    @Transactional
+    public void addSeenWords(Authentication authentication, List<Word> words) {
+        Optional<AppUser> authAppUser = authenticationToAppUser(authentication);
+
+        if (authAppUser.isEmpty())
+            return;
+
+        AppUser appUser = authAppUser.get();
+
+        for (Word word : words) {
+            appUser.getSeenWords().add(word);
+            word.getAppUsers().add(appUser);
+        }
+
+        appUserRepository.save(appUser);
+    }
+    // Field Method
+
+    // NewsBookmark Method
+    @Override
+    @Transactional
+    public NewsDto newsBookmark(Authentication authentication, UUID uuid) {
+        Optional<AppUser> authAppUser = authenticationToAppUser(authentication);
+
+        if (authAppUser.isEmpty())
+            return null;
+
+        AppUser appUser = authAppUser.get();
+
+        News news = newsRepository.findByUuid(uuid);
+
+        if (news == null)
+            return null;
+
+        if (!appUser.getBookmarks().contains(news)) {
+            appUser.getBookmarks().add(news);
+            news.getAppUsers().add(appUser);
+
+            appUserRepository.save(appUser);
+            newsRepository.save(news);
+        }
+
+        return NewsServiceJpaImpl.newsToNewsDto(news);
+    }
+
+    @Override
+    public List<NewsDto> readAllBookmark(Authentication authentication) {
+        List<NewsDto> newsDtos = new ArrayList<>();
+        Optional<AppUser> authAppUser = authenticationToAppUser(authentication);
+
+        if (authAppUser.isEmpty())
+            return null;
+
+        AppUser appUser = authAppUser.get();
+
+        for (News news : appUser.getBookmarks()) {
+            newsDtos.add(NewsServiceJpaImpl.newsToNewsDto(news));
+        }
+
+        return  newsDtos;
+    }
+
+    @Override
+    @Transactional
+    public void deleteNewsBookmark(Authentication authentication, UUID uuid) {
+        Optional<AppUser> authAppUser = authenticationToAppUser(authentication);
+
+        if (authAppUser.isEmpty())
+            return;
+
+        AppUser appUser = authAppUser.get();
+
+        News news = newsRepository.findByUuid(uuid);
+
+        if (news == null)
+            return;
+
+        if (appUser.getBookmarks().contains(news)) {
+            appUser.getBookmarks().remove(news);
+            news.getAppUsers().remove(appUser);
+
+            appUserRepository.save(appUser);
+            newsRepository.save(news);
+        }
+    }
+    // NewsBookmark Method
+
 
     @Override
     public Boolean redundancyCheck(RedundancyCheckRequest redundancyCheckRequest) {
@@ -121,7 +229,7 @@ public class AppUserServiceJpaImpl implements AppUserService {
         return false;
     }
 
-    private AppUserDto appUserToAppUserDto(AppUser appUser) {
+    public static AppUserDto appUserToAppUserDto(AppUser appUser) {
         MemberDto memberDto = new  MemberDto(appUser.getMember().getMemberId(), appUser.getMember().getLoginId(), appUser.getMember().getPassword(), null);
         AppUserDto appUserDto = new AppUserDto(appUser.getAppUserId(), appUser.getUsername(), appUser.getPhoneNumber(), appUser.getEmail(), appUser.getVocabularyLevel(), appUser.getViews(), memberDto);
 

@@ -24,6 +24,10 @@ public class Comment {
     private String comment;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "news_id")
+    private News news;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "app_user_id")
     private AppUser appUser;
 }
