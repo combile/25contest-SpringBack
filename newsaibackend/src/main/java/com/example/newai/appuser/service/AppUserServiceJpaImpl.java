@@ -240,7 +240,7 @@ public class AppUserServiceJpaImpl implements AppUserService {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
         if (customUserDetails == null) {
-            return  Optional.empty();
+            return Optional.empty();
         }
 
         Member member = memberRepository.findByLoginId(customUserDetails.getLoginId());

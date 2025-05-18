@@ -28,6 +28,8 @@ public class QComment extends EntityPathBase<Comment> {
 
     public final NumberPath<Long> commentId = createNumber("commentId", Long.class);
 
+    public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
+
     public final com.example.newai.news.entity.QNews news;
 
     public QComment(String variable) {
