@@ -66,7 +66,7 @@ public class PNEvaluationController {
             )
         }
     )
-    @GetMapping("/reading/{uuid}")
+    @GetMapping("/pnevaluations/{uuid}")
     public ResponseEntity<?> readPNEvaluation(@PathVariable UUID uuid) {
         PNEvaluationDto pnEvaluationDto = pNEvaluationService.readPNEvaluation(uuid);
 
