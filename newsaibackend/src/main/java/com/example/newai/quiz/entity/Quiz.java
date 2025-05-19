@@ -21,7 +21,6 @@ public class Quiz {
     @NotBlank
     private String question;
     @NotNull
-    @NotBlank
     private Integer answer;
 
     @NotNull
