@@ -19,10 +19,8 @@ public class QuizResult {
     private Long quizResultId;
 
     @NotNull
-    @NotBlank
     private Integer selectedValue;
     @NotNull
-    @NotBlank
     private boolean isCorrect;
 
     @OneToOne(fetch = FetchType.LAZY)

@@ -24,13 +24,13 @@ public class QQuiz extends EntityPathBase<Quiz> {
 
     public final NumberPath<Integer> answer = createNumber("answer", Integer.class);
 
-    public final NumberPath<Integer> optionFore = createNumber("optionFore", Integer.class);
+    public final StringPath optionFour = createString("optionFour");
 
-    public final NumberPath<Integer> optionOne = createNumber("optionOne", Integer.class);
+    public final StringPath optionOne = createString("optionOne");
 
-    public final NumberPath<Integer> optionThree = createNumber("optionThree", Integer.class);
+    public final StringPath optionThree = createString("optionThree");
 
-    public final NumberPath<Integer> optionTwo = createNumber("optionTwo", Integer.class);
+    public final StringPath optionTwo = createString("optionTwo");
 
     public final StringPath question = createString("question");
 

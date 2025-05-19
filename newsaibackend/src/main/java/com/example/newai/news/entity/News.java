@@ -40,7 +40,6 @@ public class News {
 
     private String thumbnailUrl;
 
-    @CreationTimestamp
     private LocalDateTime createdAt;
 
     // LOW MIDDLE HIGH가 존재해서 일대다

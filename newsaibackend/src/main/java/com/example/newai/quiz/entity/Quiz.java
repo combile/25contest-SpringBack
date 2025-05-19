@@ -26,16 +26,16 @@ public class Quiz {
 
     @NotNull
     @NotBlank
-    private Integer optionOne;
+    private String optionOne;
     @NotNull
     @NotBlank
-    private Integer optionTwo;
+    private String optionTwo;
     @NotNull
     @NotBlank
-    private Integer optionThree;
+    private String optionThree;
     @NotNull
     @NotBlank
-    private Integer optionFore;
+    private String optionFour;
 
     @OneToOne(mappedBy = "quiz", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private QuizResult quizResult;
