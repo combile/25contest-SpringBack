@@ -16,6 +16,7 @@ public class CorsConfig {
         corsConfiguration.addAllowedMethod("*");
         //JWT 쿠키기반 사용
         corsConfiguration.setAllowCredentials(true);
+        corsConfiguration.addExposedHeader("Authorization");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
