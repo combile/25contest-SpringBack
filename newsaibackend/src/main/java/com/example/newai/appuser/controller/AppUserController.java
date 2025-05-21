@@ -61,7 +61,7 @@ public class AppUserController {
 
     @Operation(
         summary = "이메일, 아이디 중복 확인",
-        description = "회원가입시 이메일 혹은 아이디 중복을 확인 해줌",
+        description = "회원가입시 이메일 혹은 아이디 중복을 확인 해줌<br>중복 테스트 시에는 각 필드 하나만 보낼것<br>ex) 이메일은 이메일 필드만, 로그인아이디는 로그인 아이디만.",
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
             required = true,
             content = @Content(
