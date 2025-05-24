@@ -35,6 +35,8 @@ public class News {
     private String author;
     @OneToMany(mappedBy = "news", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Domain> domains =  new ArrayList<>();
+    @Lob
+    @Column(columnDefinition = "CLOB")
     private String content;
     private Integer views;
 

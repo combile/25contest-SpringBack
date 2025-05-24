@@ -23,6 +23,8 @@ public class Summary {
     private Level level;
     @NotNull
     @NotBlank
+    @Lob
+    @Column(columnDefinition = "CLOB")
     private String summaryContent;
 
     @ManyToOne(fetch = FetchType.LAZY) // 추후 Many 변경 가능
