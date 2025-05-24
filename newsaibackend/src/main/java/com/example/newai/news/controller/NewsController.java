@@ -78,8 +78,9 @@ public class NewsController {
     )
     @GetMapping("/reading/all")
     public ResponseEntity<?> readAllNewsByLatest(@RequestParam String sort) {
-        if (sort==null || (!sort.equals("views") || !sort.equals("latest")))
+        if (!"views".equals(sort) && !"latest".equals(sort)) {
             return new ResponseEntity<>("정렬 기준을 입력해주세요.", HttpStatus.BAD_REQUEST);
+        }
 
         List<NewsDto> newsDtos;
 
