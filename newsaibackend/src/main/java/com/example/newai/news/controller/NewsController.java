@@ -145,6 +145,31 @@ public class NewsController {
         return new ResponseEntity<>(newsDtos, HttpStatus.OK);
     }
 
+    @Operation(
+        summary = "북마크 여부 확인",
+        description = "뉴스 UUID를 통해 북마크 되었는지 여부 확인.",
+        parameters = {
+            @Parameter(
+                in = ParameterIn.PATH,
+                name = "uuid",
+                description = "뉴스 UUID",
+                required = true,
+                example = "123e4567-e89b-12d3-a456-426614174000"
+            ),
+            @Parameter(
+                in = ParameterIn.HEADER,
+                name = HttpHeaders.AUTHORIZATION,
+                required = true,
+                description = "Bearer 액세스 토큰. 형식: Bearer {accessToken}"
+            )
+        },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "북마크 뉴스 여부 확인",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))),
+            @ApiResponse(responseCode = "404", description = "잘못된 사용자",
+                content = @Content(mediaType = "text/plain", schema = @Schema(example = "존재하지 않는 사용자 입니다.")))
+        }
+    )
     @GetMapping("/check-bookmark/{uuid}")
     public ResponseEntity<?> checkBookmark(Authentication authentication, @PathVariable UUID uuid) {
         Boolean isBookmarked = newsService.isBookmarked(authentication, uuid);
@@ -155,6 +180,20 @@ public class NewsController {
         return new ResponseEntity<>(isBookmarked, HttpStatus.OK);
     }
 
+    @Operation(
+        summary = "북마크 안된 뉴스 조회",
+        description = "북마크가 되지 않은 뉴스들을 전부 조회",
+        parameters = {
+            @Parameter(name = HttpHeaders.AUTHORIZATION, in = ParameterIn.HEADER,
+                description = "Bearer 액세스 토큰. 형식: Bearer {accessToken}", required = true)
+        },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "북마크 되지 않은 뉴스 리스트",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = NewsDto.class))),
+            @ApiResponse(responseCode = "404", description = "잘못된 사용자",
+                content = @Content(mediaType = "text/plain", schema = @Schema(example = "존재하지 않는 사용자 입니다.")))
+        }
+    )
     @GetMapping("/un-bookmark")
     public ResponseEntity<?> unBookmark(Authentication authentication) {
         List<NewsDto> newsDtos = newsService.unBookmarkedNews(authentication);
