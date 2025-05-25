@@ -22,10 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -118,6 +115,43 @@ public class NewsServiceJpaImpl implements NewsService {
         for (News result : results) {
             newsDtos.add(newsToNewsDto(result));
         }
+
+        return newsDtos;
+    }
+
+    @Override
+    public Boolean isBookmarked(Authentication authentication, UUID uuid) {
+        Optional<AppUser> authAppUser = authenticationToAppUser(authentication);
+
+        if (authAppUser.isEmpty())
+            return null;
+
+        AppUser appUser = authAppUser.get();
+
+        Set<News> bookmarkedNews = appUser.getBookmarks();
+        News targetNews = newsRepository.findByUuid(uuid);
+
+        return bookmarkedNews.contains(targetNews);
+    }
+
+    @Override
+    public List<NewsDto> unBookmarkedNews(Authentication authentication) {
+        Optional<AppUser> authAppUser = authenticationToAppUser(authentication);
+
+        if (authAppUser.isEmpty())
+            return null;
+
+        AppUser appUser = authAppUser.get();
+
+        Set<News> bookmarkedNews = appUser.getBookmarks();
+        Set<News> allNews = new HashSet<>(newsRepository.findAll());
+
+        allNews.removeAll(bookmarkedNews);
+
+        List<NewsDto> newsDtos = allNews.stream()
+            .sorted(Comparator.comparing(News::getNewsId))
+            .map(NewsServiceJpaImpl::newsToNewsDto)
+            .toList();
 
         return newsDtos;
     }

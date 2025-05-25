@@ -144,4 +144,24 @@ public class NewsController {
 
         return new ResponseEntity<>(newsDtos, HttpStatus.OK);
     }
+
+    @GetMapping("/check-bookmark/{uuid}")
+    public ResponseEntity<?> checkBookmark(Authentication authentication, @PathVariable UUID uuid) {
+        Boolean isBookmarked = newsService.isBookmarked(authentication, uuid);
+
+        if (isBookmarked==null)
+            return new ResponseEntity<>("존재하지 않는 사용자 입니다.", HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(isBookmarked, HttpStatus.OK);
+    }
+
+    @GetMapping("/un-bookmark")
+    public ResponseEntity<?> unBookmark(Authentication authentication) {
+        List<NewsDto> newsDtos = newsService.unBookmarkedNews(authentication);
+
+        if (newsDtos==null)
+            return new ResponseEntity<>("존재하지 않는 사용자 입니다.", HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(newsDtos, HttpStatus.OK);
+    }
 }

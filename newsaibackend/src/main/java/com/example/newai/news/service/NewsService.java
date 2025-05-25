@@ -13,4 +13,7 @@ public interface NewsService {
     List<NewsDto> readAllNewsByViews();
     List<NewsDto> searchNews(String keyword);
     List<NewsDto> searchBookmark(Authentication authentication, String keyword);
+
+    Boolean isBookmarked(Authentication authentication, UUID uuid);
+    List<NewsDto> unBookmarkedNews(Authentication authentication);
 }
