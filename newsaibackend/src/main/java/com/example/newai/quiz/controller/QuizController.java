@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,8 +61,8 @@ public class QuizController {
         }
     )
     @GetMapping("/several-quiz")
-    public ResponseEntity<?> extractTenQuiz() {
-        List<QuizDto> quizDtos = quizService.extractQuiz();
+    public ResponseEntity<?> extractTenQuiz(Authentication authentication) {
+        List<QuizDto> quizDtos = quizService.extractQuiz(authentication);
 
         if (quizDtos == null)
             return new ResponseEntity<>("더이상 제공될 퀴즈가 없습니다.", HttpStatus.NOT_FOUND);
