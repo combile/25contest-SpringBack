@@ -1,11 +1,18 @@
 package com.example.newai.quiz.service;
 
+import com.example.newai.appuser.entity.AppUser;
+import com.example.newai.appuser.repository.AppUserRepository;
+import com.example.newai.appuser.service.AppUserService;
+import com.example.newai.login.CustomUserDetails;
+import com.example.newai.member.entity.Member;
+import com.example.newai.member.repository.MemberRepository;
 import com.example.newai.quiz.entity.Quiz;
 import com.example.newai.quiz.repository.QuizRepository;
 import com.example.newai.quiz.vo.QuizDto;
 import com.example.newai.quizresult.entity.QuizResult;
 import com.example.newai.quizresult.repository.QuizResultRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -16,10 +23,12 @@ public class QuizServiceJpaImpl implements QuizService {
     private static final Integer QUIZ_SET_SIZE = 10;
     private final QuizRepository quizRepository;
     private final QuizResultRepository quizResultRepository;
+    private final MemberRepository memberRepository;
+    private final AppUserRepository appUserRepository;
 
     @Override
-    public List<QuizDto> extractQuiz() {
-        List<Quiz> quizList = improvedExtractQuizSet();
+    public List<QuizDto> extractQuiz(Authentication authentication) {
+        List<Quiz> quizList = improvedExtractQuizSet(authentication);
         List<QuizDto> quizDtos = quizList.stream().map(QuizServiceJpaImpl::quizToQuizDto).toList();
 
         return quizDtos;
@@ -35,10 +44,17 @@ public class QuizServiceJpaImpl implements QuizService {
         return quizToQuizDto(quiz);
     }
 
-    private List<Quiz> improvedExtractQuizSet() {
+    private List<Quiz> improvedExtractQuizSet(Authentication authentication) {
+        Optional<AppUser> authAppUser = authenticationToAppUser(authentication);
+
+        if (authAppUser.isEmpty())
+            return null;
+
+        AppUser appUser = authAppUser.get();
+
         Random random = new Random();
         List<Quiz> standardQuizSet = quizRepository.findAll();
-        List<QuizResult> myQuizResults = quizResultRepository.findAll();
+        List<QuizResult> myQuizResults = quizResultRepository.findByAppUser(appUser);
         // 틀린 문제에 대해선 해당 배열에서 삭제
 
         // 만약 전체 문제 - 내가 푼 문제중 정답인 문제 < QUIZ_SET_SIZE -> null;
@@ -80,5 +96,16 @@ public class QuizServiceJpaImpl implements QuizService {
 
     public static QuizDto quizToQuizDto(Quiz quiz) {
         return new QuizDto(quiz.getQuizId(), quiz.getQuestion(), quiz.getOptionOne(), quiz.getOptionTwo(), quiz.getOptionThree(), quiz.getOptionFour());
+    }
+
+    private Optional<AppUser> authenticationToAppUser(Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        if (customUserDetails == null) {
+            return Optional.empty();
+        }
+
+        Member member = memberRepository.findByLoginId(customUserDetails.getLoginId());
+        return appUserRepository.findById(member.getAppUser().getAppUserId());
     }
 }
